@@ -7,7 +7,20 @@
 
 import UIKit
 
-class OrdersTableViewController: UITableViewController {
+class OrdersTableViewController: UITableViewController, AddOrderDelegate {
+    
+    func didSave(controller: UIViewController, order: Order) {
+        controller.dismiss(animated: true)
+
+        let order = OrderViewModel(order: order)
+        self.ordersListViewModel.ordersViewModel.append(order)
+        self.tableView.insertRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
+    }
+    
+    func didClose(controller: UIViewController) {
+        controller.dismiss(animated: true)
+    }
+    
 
     var ordersListViewModel = OrderListViewModel()
     
@@ -18,11 +31,7 @@ class OrdersTableViewController: UITableViewController {
     }
     
     func populateOrders() {
-        guard let url = URL(string: "https://668b80800b61b8d23b09d32d.mockapi.io/api/coffeeapp/orders") else {
-            return
-        }
-        let resource = Resource<[Order]>(url: url)
-        WebService().load(resource: resource) { [weak self] result in
+        WebService().load(resource: Order.all) { [weak self] result in
             switch result {
             case .success(let orders):
                 self?.ordersListViewModel.ordersViewModel = orders.map(OrderViewModel.init)
@@ -54,6 +63,11 @@ class OrdersTableViewController: UITableViewController {
         cell.textLabel?.text = vm.type
         cell.detailTextLabel?.text = vm.size
         return cell
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let addOffeeVc = (segue.destination as! UINavigationController).viewControllers.first as! AddOrderNewViewController
+        addOffeeVc.delegate = self
     }
     
 

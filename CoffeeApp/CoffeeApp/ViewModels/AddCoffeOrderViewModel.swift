@@ -10,6 +10,8 @@ import Foundation
 class AddCoffeOrderViewModel {
     var name: String?
     var email: String?
+    var selectedSize: String?
+    var selectedType: String?
     
     var types: [String] {
         return CoffeeType.allCases.map { $0.rawValue.capitalized }
